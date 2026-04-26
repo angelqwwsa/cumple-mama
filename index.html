@@ -1,62 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Para Mamá 💖</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Mamá 💖</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-    }
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
 
-    #app {
-      width: 340px;
-      text-align: center;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: radial-gradient(circle, #000, #111);
+  color: white;
+  overflow: hidden;
+}
 
-    #screen {
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 15px;
-      background: rgba(255,255,255,0.05);
-      min-height: 200px;
-      transition: 1s;
-    }
+#intro, #app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
 
-    #img {
-      width: 100%;
-      border-radius: 10px;
-      margin-top: 10px;
-      display: none;
-    }
+#screen {
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 20px;
+  width: 300px;
+  min-height: 150px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
 
-    button {
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-    }
-  </style>
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(45deg, #ff4d6d, #ff85a2);
+  color: white;
+  cursor: pointer;
+}
+
+#progress {
+  width: 0%;
+  height: 5px;
+  background: pink;
+  margin-top: 10px;
+}
+</style>
 </head>
 
 <body>
 
-<div id="app">
+<div id="intro">
+  <h1>🎁 Tengo algo especial 💖</h1>
+  <button onclick="start()">▶️ Empezar</button>
+</div>
+
+<div id="app" style="display:none;">
   <h1>🎂 Para Mamá 💖</h1>
 
   <div id="screen">
     <p id="text"></p>
-    <img id="img" />
   </div>
 
-  <button onclick="start()">▶️ Iniciar experiencia</button>
+  <div id="choices"></div>
+
+  <div id="progress"></div>
+
+  <button id="giftBtn" onclick="surprise()" style="display:none;">
+    🎁 Abrir sorpresa
+  </button>
 </div>
 
 <audio id="music" loop>
@@ -67,84 +85,135 @@
 let i = 0;
 
 let scenes = [
-  "🎬 Iniciando historia...",
-  "💖 Hoy celebramos a una persona increíble",
-  "🌸 Una mamá llena de amor y fuerza",
-  "📸 Recuerdos aparecen lentamente...",
-  "🎂 44 años de vida maravillosa",
-  "💖 FELIZ CUMPLEAÑOS MAMÁ 💖"
+  "🎬 Hoy es tu día especial...",
+  "💖 ¿Qué quieres ver?"
 ];
 
-let images = [
-  "",
-  "",
-  "",
-  "https://images.unsplash.com/photo-1519741497674-611481863552",
-  "",
-  ""
-];
+let paths = {
+  recuerdos: [
+    "📸 Recuerdo cuando siempre me ayudabas",
+    "😊 Siempre estabas conmigo",
+    "💖 Gracias por todo mamá"
+  ],
+  amor: [
+    "💖 Eres la mejor mamá",
+    "🌸 Tu amor es infinito",
+    "💖 Te quiero muchísimo"
+  ]
+};
 
-function start() {
-  document.getElementById("music").play();
-  nextScene();
+function type(text, el) {
+  el.innerHTML = "";
+  let j = 0;
+  let interval = setInterval(() => {
+    el.innerHTML += text[j];
+    j++;
+    if (j >= text.length) clearInterval(interval);
+  }, 40);
 }
 
-function nextScene() {
+function start() {
+  document.getElementById("intro").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+
+  let music = document.getElementById("music");
+  music.volume = 0;
+  music.play();
+
+  let fade = setInterval(() => {
+    if (music.volume < 1) music.volume += 0.05;
+    else clearInterval(fade);
+  }, 200);
+
+  next();
+}
+
+function next() {
   if (i < scenes.length) {
     let text = document.getElementById("text");
-    let img = document.getElementById("img");
 
-    text.style.opacity = 0;
+    type(scenes[i], text);
 
-    setTimeout(() => {
-      text.innerText = scenes[i];
-      text.style.opacity = 1;
-    }, 500);
+    document.getElementById("progress").style.width =
+      (i / scenes.length) * 100 + "%";
 
-    if (images[i]) {
-      img.src = images[i];
-      img.style.display = "block";
+    if (i === 1) {
+      setTimeout(showChoices, 2500);
     } else {
-      img.style.display = "none";
+      setTimeout(next, 3000);
     }
 
     i++;
-    setTimeout(nextScene, 2500);
   } else {
-    finalScene();
+    end();
   }
 }
 
-function finalScene() {
-  document.body.style.transition = "2s";
-  document.body.style.background = "#111";
+function showChoices() {
+  let choices = document.getElementById("choices");
 
-  document.getElementById("text").innerText =
-    "🎉 FELIZ CUMPLEAÑOS MAMÁ 🎉";
-
-  for (let j = 0; j < 80; j++) {
-    confetti();
-  }
+  choices.innerHTML = `
+    <button onclick="choose('recuerdos')">📸 Recuerdos</button>
+    <button onclick="choose('amor')">💖 Mensaje de amor</button>
+  `;
 }
 
-function confetti() {
-  let c = document.createElement("div");
-  c.innerText = "🎉";
-  c.style.position = "absolute";
-  c.style.left = Math.random() * window.innerWidth + "px";
-  c.style.top = "-20px";
-  c.style.fontSize = "20px";
-  document.body.appendChild(c);
+function choose(option) {
+  document.getElementById("choices").innerHTML = "";
 
-  let fall = setInterval(() => {
-    let t = parseInt(c.style.top);
-    c.style.top = t + 5 + "px";
+  let arr = paths[option];
+  let idx = 0;
 
-    if (t > window.innerHeight) {
-      c.remove();
-      clearInterval(fall);
+  function show() {
+    if (idx < arr.length) {
+      type(arr[idx], document.getElementById("text"));
+      idx++;
+      setTimeout(show, 2500);
+    } else {
+      end();
+    }
+  }
+
+  show();
+}
+
+function particle(symbol, speed) {
+  let p = document.createElement("div");
+  p.innerText = symbol;
+  p.style.position = "absolute";
+  p.style.left = Math.random() * window.innerWidth + "px";
+  p.style.top = window.innerHeight + "px";
+  document.body.appendChild(p);
+
+  let move = setInterval(() => {
+    let t = parseInt(p.style.top);
+    p.style.top = t - speed + "px";
+
+    if (t < -20) {
+      p.remove();
+      clearInterval(move);
     }
   }, 20);
+}
+
+function end() {
+  document.getElementById("text").innerHTML =
+    "🎉 FELIZ CUMPLEAÑOS MAMÁ 🎉";
+
+  document.getElementById("giftBtn").style.display = "block";
+
+  setInterval(() => particle("💖", 3), 200);
+  setInterval(() => particle("✨", 2), 300);
+  setInterval(() => particle("🎉", 5), 150);
+}
+
+function surprise() {
+  alert("💖 Gracias por ser la mejor mamá del mundo 💖");
+}
+
+// Service Worker (opcional)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
 }
 </script>
 
