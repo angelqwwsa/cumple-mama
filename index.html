@@ -1,80 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>Calculadora Pro</title>
+  <title>Calculadora Pro</title>
 
-<link rel="manifest" href="manifest.json">
+  <!-- 📦 MANIFEST (IMPORTANTE PARA APP) -->
+  <link rel="manifest" href="manifest.json">
 
-<style>
-body {
-  margin: 0;
-  background: radial-gradient(circle, #111, #000);
-  color: #00ffcc;
-  font-family: monospace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+  <!-- 🎨 ESTILO -->
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle, #111, #000);
+      color: #00ffcc;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-#app {
-  width: 340px;
-  padding: 15px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.05);
-  box-shadow: 0 0 25px #00ffcc;
-  text-align: center;
-}
+    #app {
+      width: 320px;
+      padding: 15px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 0 20px #00ffcc;
+      text-align: center;
+    }
 
-input {
-  width: 100%;
-  height: 50px;
-  font-size: 24px;
-  text-align: right;
-  margin-bottom: 10px;
-}
+    input {
+      width: 100%;
+      height: 50px;
+      font-size: 24px;
+      text-align: right;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      border: none;
+      padding: 5px;
+    }
 
-button {
-  margin: 3px;
-  padding: 10px;
-  border-radius: 10px;
-  background: black;
-  color: #00ffcc;
-  border: 1px solid #00ffcc;
-}
+    button {
+      margin: 3px;
+      padding: 10px;
+      border-radius: 10px;
+      background: black;
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+      cursor: pointer;
+    }
 
-button:hover {
-  background: #00ffcc;
-  color: black;
-}
+    button:hover {
+      background: #00ffcc;
+      color: black;
+    }
 
-#buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-}
-</style>
+    #buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+  </style>
 </head>
 
 <body>
 
 <div id="app">
-  <h2>🧮 CALCULADORA PRO</h2>
+  <h2>🧮 Calculadora Pro</h2>
 
   <input id="screen" disabled />
 
   <div id="buttons"></div>
 </div>
 
-<script src="script.js"></script>
-
+<!-- ⚙️ JS -->
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
+let screen = document.getElementById("screen");
+
+function press(v) {
+  screen.value += v;
 }
+
+function calc() {
+  try {
+    screen.value = eval(screen.value);
+  } catch {
+    screen.value = "Error";
+  }
+}
+
+function clearAll() {
+  screen.value = "";
+}
+
+let buttons = [
+  "7","8","9","/",
+  "4","5","6","*",
+  "1","2","3","-",
+  "0",".","=","+"
+];
+
+let html = "";
+
+buttons.forEach(b => {
+  if (b === "=") {
+    html += `<button onclick="calc()">=</button>`;
+  } else {
+    html += `<button onclick="press('${b}')">${b}</button>`;
+  }
+});
+
+html += `<button onclick="clearAll()" style="grid-column: span 4;">C</button>`;
+
+document.getElementById("buttons").innerHTML = html;
+
+// ⌨️ teclado
+document.addEventListener("keydown", e => {
+  if (!isNaN(e.key) || "+-*/().".includes(e.key)) press(e.key);
+  if (e.key === "Enter") calc();
+});
 </script>
 
-</body>
-</html>
+<!-- 📲 SERVICE WORKER -->
+<script>
+if ("service
