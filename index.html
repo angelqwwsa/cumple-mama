@@ -12,3 +12,128 @@
 <audio id="music" loop>
   <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
 </audio>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+}
+
+#app {
+  width: 340px;
+  text-align: center;
+}
+
+#screen {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.05);
+  min-height: 200px;
+  transition: 1s;
+}
+
+#img {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+  display: none;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+let i = 0;
+
+let scenes = [
+  "🎬 Iniciando historia...",
+  "💖 Hoy celebramos a una persona increíble",
+  "🌸 Una mamá llena de amor y fuerza",
+  "📸 Recuerdos aparecen lentamente...",
+  "🎂 44 años de vida maravillosa",
+  "💖 FELIZ CUMPLEAÑOS MAMÁ 💖"
+];
+
+let images = [
+  "",
+  "",
+  "",
+  "https://images.unsplash.com/photo-1519741497674-611481863552",
+  "",
+  ""
+];
+
+function start() {
+  document.getElementById("music").play();
+  nextScene();
+}
+
+function nextScene() {
+  if (i < scenes.length) {
+    let text = document.getElementById("text");
+    let img = document.getElementById("img");
+
+    // ✨ efecto cinematográfico
+    text.style.opacity = 0;
+
+    setTimeout(() => {
+      text.innerText = scenes[i];
+      text.style.opacity = 1;
+    }, 500);
+
+    // 📸 fotos
+    if (images[i]) {
+      img.src = images[i];
+      img.style.display = "block";
+    } else {
+      img.style.display = "none";
+    }
+
+    i++;
+
+    setTimeout(nextScene, 2500);
+  } else {
+    finalScene();
+  }
+}
+
+// 🎉 FINAL EXTREMO
+function finalScene() {
+  document.body.style.transition = "2s";
+  document.body.style.background = "#111";
+
+  document.getElementById("text").innerText =
+    "🎉 FELIZ CUMPLEAÑOS MAMÁ 🎉";
+
+  for (let j = 0; j < 80; j++) {
+    confetti();
+  }
+}
+
+// 🎊 confeti extremo
+function confetti() {
+  let c = document.createElement("div");
+  c.innerText = "🎉";
+  c.style.position = "absolute";
+  c.style.left = Math.random() * window.innerWidth + "px";
+  c.style.top = "-20px";
+  c.style.fontSize = "20px";
+  document.body.appendChild(c);
+
+  let fall = setInterval(() => {
+    let t = parseInt(c.style.top);
+    c.style.top = t + 5 + "px";
+
+    if (t > window.innerHeight) {
+      c.remove();
+      clearInterval(fall);
+    }
+  }, 20);
+}
